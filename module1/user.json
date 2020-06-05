@@ -1,5 +1,5 @@
 {   
-    "password": "myrdin31700",
+    "password": "password",
     "admin": false,
     "profileUpdatable": true,
     "groups" : [ "readers", "dev-team" ],
