@@ -1,0 +1,21 @@
+  {
+    "repo" : {
+      "repositories": ["gradle-dev-local","jcenter"],
+      "actions": {
+          "groups" : {
+            "dev-team" : ["write","annotate", "read"],
+            "release-team" : ["delete","annotate", "read","managedXrayMeta"] 
+          }
+      }
+    },
+    "build" : {
+      "include-patterns" : ["**gradle**"],
+      "repositories": ["artifactory-build-info"],
+      "actions": {
+        "groups" : {
+          "dev-team" : ["read","write"]
+        }
+      }
+    }
+    
+  }
