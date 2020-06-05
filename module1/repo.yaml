@@ -63,6 +63,7 @@ remoteRepositories:
       repoLayout: simple-default
       xray:
         enabled: true
+      enableTokenAuthentication: true
   helm-remote:
       type: helm
       url: https://storage.googleapis.com/kubernetes-charts
