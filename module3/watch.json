@@ -26,7 +26,12 @@
             {
                 "type": "build",
                 "bin_mgr_id": "default",
-                "name": "docker"
+                "name": "docker-app"
+            },
+            {
+                "type": "build",
+                "bin_mgr_id": "default",
+                "name": "docker-framework"
             }
         ]
     },

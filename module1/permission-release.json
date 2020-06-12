@@ -1,22 +1,11 @@
 {
     "repo" : {
-      "repositories": ["gradle-staging-local","gradle-prod-local"],
+      "repositories": ["gradle-staging-local","docker-staging-local"],
       "actions": {
           "groups" : {
-            "dev-team" : ["write","annotate", "read"],
-            "release-team" : ["delete","annotate", "read","managedXrayMeta"] 
+            "dev-team" : ["read"],
+            "release-team" : ["delete","write","annotate", "read","managedXrayMeta"] 
           }
       }
-    },
-    "build" : {
-      "include-patterns" : ["**gradle**"],
-      "repositories": ["artifactory-build-info"],
-      "actions": {
-        "groups" : {
-          "dev-team" : ["read"],
-          "release-team" : ["write", "delete","annotate", "read","managedXrayMeta"] 
-        }
-      }
     }
-    
   }

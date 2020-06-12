@@ -64,6 +64,12 @@ remoteRepositories:
       xray:
         enabled: true
       enableTokenAuthentication: true
+  jcenter:
+      type: gradle
+      url: https://jcenter.bintray.com
+      repoLayout: gradle-default
+      xray:
+        enabled: true
   helm-remote:
       type: helm
       url: https://storage.googleapis.com/kubernetes-charts
@@ -92,10 +98,12 @@ virtualRepositories:
   libs-release:
       type: maven
       repositories:
-        - libs-release-local
+        - gradle-dev-local
+        - gradle-staging-local
+        - gradle-prod-local
         - jcenter
-      description: "maven libraries virtual"
-      defaultDeploymentRepo: libs-release-local
+      description: "gradle libraries virtual"
+      defaultDeploymentRepo: gradle-dev-local
   helm-virtual:
       type: helm
       repositories:

@@ -1,6 +1,6 @@
   {
     "repo" : {
-      "repositories": ["gradle-dev-local","jcenter"],
+      "repositories": ["gradle-dev-local","jcenter","docker-dev-local","docker-remote"],
       "actions": {
           "groups" : {
             "dev-team" : ["write","annotate", "read"],
@@ -9,11 +9,13 @@
       }
     },
     "build" : {
-      "include-patterns" : ["**gradle**"],
+      "include-patterns" : ["gradle/**","docker-framework/**","docker-app//**"],
       "repositories": ["artifactory-build-info"],
       "actions": {
         "groups" : {
-          "dev-team" : ["read","write"]
+          "dev-team" : ["read","annotate","write"],
+          "release-team" : ["read","annotate","write"],
+          "security-team" : ["read","annotate","write","managedXrayMeta"]
         }
       }
     }

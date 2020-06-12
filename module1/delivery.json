@@ -2,6 +2,6 @@
     "password": "password31",
     "admin": false,
     "profileUpdatable": true,
-    "groups" : [ "readers", "dev-team" ],
+    "groups" : [ "readers", "delivery-team" ],
     "email" : "null@jfrog.com"
 }
