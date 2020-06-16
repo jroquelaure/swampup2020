@@ -23,19 +23,19 @@ curl http://$ARTIFACTORY_URL/artifactory/api/system/ping
 ## 1st Lab
 ##############
 
-#delete default permissions target
+# OPTIONAL : delete default permissions target
 curl -uadmin:$ADMIN_PASSWORD -X DELETE http://$ARTIFACTORY_URL/artifactory/api/v2/security/permissions/Anything
 curl -uadmin:$ADMIN_PASSWORD -X DELETE http://$ARTIFACTORY_URL/artifactory/api/v2/security/permissions/Any%20Remote
 
 
-#Create base needed repository for gradle (gradle-dev-local, jcenter, libs-release)
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-dev-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/init/repository-gradle-dev-local-config.json
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-staging-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/init/repository-gradle-dev-local-config.json
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-prod-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/init/repository-gradle-dev-local-config.json
+# Create base needed repository for gradle (gradle-dev-local, jcenter, libs-release)
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-dev-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/module1/repository-gradle-dev-local-config.json
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-staging-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/module1/repository-gradle-dev-local-config.json
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/gradle-prod-local -H "content-type: application/vnd.org.jfrog.artifactory.repositories.LocalRepositoryConfiguration+json" -T $SCRIPT_DIR/module1/repository-gradle-dev-local-config.json
 
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/jcenter -H "content-type: application/vnd.org.jfrog.artifactory.repositories.RemoteRepositoryConfiguration+json" -T $SCRIPT_DIR/init/jcenter-remote-config.json
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/jcenter -H "content-type: application/vnd.org.jfrog.artifactory.repositories.RemoteRepositoryConfiguration+json" -T $SCRIPT_DIR/module1/jcenter-remote-config.json
 
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/libs-releases -H "content-type: application/vnd.org.jfrog.artifactory.repositories.VirtualRepositoryConfiguration+json" -T $SCRIPT_DIR/init/repository-gradle-release-virtual-config.json
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/repositories/libs-releases -H "content-type: application/vnd.org.jfrog.artifactory.repositories.VirtualRepositoryConfiguration+json" -T $SCRIPT_DIR/module1/repository-gradle-release-virtual-config.json
 
 #create all with yaml configuration file
 curl -uadmin:$ADMIN_PASSWORD -X PATCH  http://$ARTIFACTORY_URL/artifactory/api/system/configuration -T $SCRIPT_DIR/module1/repo.yaml
@@ -51,11 +51,11 @@ export USER_LOGIN=<SetUserName>
 
 curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/security/users/$USER_LOGIN -H "content-type: application/vnd.org.jfrog.artifactory.security.User+json" -T $SCRIPT_DIR/module1/user.json
 
-#a QA engineer
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/security/users/qa -H "content-type: application/vnd.org.jfrog.artifactory.security.User+json" -T $SCRIPT_DIR/module1/qa.json
+#a release engineer
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/security/users/release -H "content-type: application/vnd.org.jfrog.artifactory.security.User+json" -T $SCRIPT_DIR/module1/qa.json
 
-#a release manager
-curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/security/users/release -H "content-type: application/vnd.org.jfrog.artifactory.security.User+json" -T $SCRIPT_DIR/module1/delivery.json
+#a consumer for prod
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/security/users/prod -H "content-type: application/vnd.org.jfrog.artifactory.security.User+json" -T $SCRIPT_DIR/module1/delivery.json
 
 #Login with user and show tree view (it is empty)
 
@@ -79,10 +79,21 @@ jfrog rt c orbitera
 #Upload generic libs to Artifactory with props
 
 jfrog rt u ....
+# jfrog rt u /Users/jon/workspace/kubernetes_example/docker-framework/tomcat/apache-tomcat-8.tar.gz tomcat-local/
+
+#profile for release with write permission on tomcat-local
+jfrog rt c orbitera-release
+jfrog rt use orbitera-release
 
 #TODO : show with cli
-# Find the latest released artifacts from specific build
+# Find largest and not in use
 curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module2/largestFile.aql
+#or
+jfrog rt s --spec module2/largestSpec.spec
+
+# Find the latest released artifacts from specific build
+jfrog rt s --spec module2/latest-webservice.json
+
 
 #AQl to find all archive with specific jar in it
  curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module2/junitfilter.aql
@@ -98,21 +109,22 @@ curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/sea
 jfrog rt gradlec
 
 # run build 
-jfrog rt gradle "clean artifactoryPublish -b build.gradle --info" --build-name=gradle --build-number=3
+jfrog rt gradle "clean artifactoryPublish -b build.gradle --info" --build-name=gradle --build-number=1
 
 # build info
-jfrog rt bp gradle 3 
+jfrog rt bp gradle 1
 
+# Find the latest released artifacts from specific build
+jfrog rt s --spec module3/latest-webservice.json
 
-
-
-
-#Now we go on QA (use qa user)
-jfrog rt c orbitera-qa
-jfrog rt use orbitera-qa
+#Now we go on QA (use release user)
+jfrog rt use orbitera-release
 
 #Test run and promote ?
-jfrog rt bpr gradle 3 gradle-staging-local --status=staged --copy=true
+jfrog rt bpr gradle 1 gradle-staging-local --status=staged --copy=true
+
+# Find the latest released artifacts from specific build (now in dev and staging repo)
+jfrog rt s --spec module3/latest-webservice.json
 
 #security
 #add build to scan
@@ -137,14 +149,14 @@ jfrog rt c orbitera-delivery
 
 jfrog rt use orbitera-delivery
 
-#Can access qualified artifact
-jfrog rt s "libs-release/*.war" --build=gradle/1
+#Can access qualified artifact (and not form non prod repo)
+jfrog rt s --spec module3/latest-webservice.json
 
 
 #docker framework
 
 #jfrog rt dpl $ARTIFACTORY_URL/docker-virtual/openjdk:11-jdk docker --build-name=docker --build-number=1
-jfrog rt dl --spec framework-download.json --build-name=docker --build-number=1 --module=framework
+jfrog rt dl --spec framework-download.json --build-name=docker-framework --build-number=1 --module=framework
 
 #we are dev
 jfrog rt use orbitera
@@ -170,12 +182,12 @@ jfrog rt bpr docker-framework 1 docker-prod-local --status=released --copy=true
 #docker app
 ./jfrog1 rt dpl $ARTIFACTORY_URL/docker-virtual/jfrog-docker-framework:1 docker-virtual --build-name=docker-app --build-number=1 --module=app 
 
-jfrog rt dl --spec appmodules-download.json --build-name=app --build-number=1 --module=app
+jfrog rt dl --spec appmodules-download.json --build-name=docker-app --build-number=1 --module=app
 
 #build
 docker build . -t $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1  -f Dockerfile --build-arg REGISTRY=$ARTIFACTORY_URL/docker-virtual --build-arg BASE_TAG=1
 
-jfrog rt dp $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:10 docker-virtual --build-name=docker-app --build-number=1 --module=app
+jfrog rt dp $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1 docker-virtual --build-name=docker-app --build-number=1 --module=app
 
 jfrog rt bp docker-app 1
 
@@ -194,6 +206,10 @@ curl -uadmin:$ADMIN_PASSWORD -X POST -H "content-type: application/json"  http:/
 curl -uadmin:$ADMIN_PASSWORD -X POST -H "content-type: application/json"  http://$ARTIFACTORY_URL/xray/api/v2/watches -T $SCRIPT_DIR/module4/watch.json
 
 # redo the whole thing or show it in pipelines and trigger a build on docker framework
+#or just use delivery to pull
+jfrog rt use orbiter-delivery
+
+jfrog rt dpl $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1 docker-virtual
 
 #maintenance
 

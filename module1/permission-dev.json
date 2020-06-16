@@ -15,7 +15,8 @@
         "groups" : {
           "dev-team" : ["read","annotate","write"],
           "release-team" : ["read","annotate","write"],
-          "security-team" : ["read","annotate","write","managedXrayMeta"]
+          "security-team" : ["read","annotate","write","managedXrayMeta"],
+          "delivery-team" : ["read"]
         }
       }
     }

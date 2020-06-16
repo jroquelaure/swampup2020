@@ -1,6 +1,6 @@
 items.find ({
         "type":"file",
-        "size":{"$gt":"100000"}, 
+        "size":{"$gt":"100000000"}, 
         "stat.downloads":{"$lte":"1"}
 })
 .include ("repo","path","name","size","stat.downloads","created")
