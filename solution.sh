@@ -168,14 +168,14 @@ jfrog rt bpr docker-framework 1 docker-prod-local --status=released --copy=true
 
 
 #docker app
-./jfrog1 rt dpl $ARTIFACTORY_URL/docker-virtual/docker-framework:1 docker-virtual --build-name=docker-app --build-number=1 --module=app
+./jfrog1 rt dpl $ARTIFACTORY_URL/docker-virtual/jfrog-docker-framework:1 docker-virtual --build-name=docker-app --build-number=1 --module=app 
 
 jfrog rt dl --spec appmodules-download.json --build-name=app --build-number=1 --module=app
 
 #build
-docker build . -t $ARTIFACTORY_URL/docker-virtual/docker-app:1  -f Dockerfile
+docker build . -t $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1  -f Dockerfile --build-arg REGISTRY=$ARTIFACTORY_URL/docker-virtual --build-arg BASE_TAG=1
 
-jfrog rt dp $ARTIFACTORY_URL/docker-virtual/docker-app:1 docker-virtual --build-name=docker-app --build-number=1 --module=app
+jfrog rt dp $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:10 docker-virtual --build-name=docker-app --build-number=1 --module=app
 
 jfrog rt bp docker-app 1
 
