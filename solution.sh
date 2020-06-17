@@ -221,3 +221,12 @@ curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/sea
 
 #AQL for cleanup
 curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module2/cleanup.aql
+
+
+# distribution 
+
+curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/v2/security/permissions/perm-delivery -H "content-type: application/json" -T $SCRIPT_DIR/module5/permission-delivery.json
+
+jfrog rt rbc myApp 1.0.0 --sign=true --spec=$SCRIPT_DIR/module5/rb-spec.json
+
+jfrog rt rbd myApp 1.0.0 --dist-rules=$SCRIPT_DIR/module5/dist-rules.json

@@ -1,0 +1,7 @@
+{
+    "files": [
+      {
+        "pattern": "docker-prod-local/jfrog-docker-app/1/**"
+      }
+    ]
+  }
