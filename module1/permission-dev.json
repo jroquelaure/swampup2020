@@ -1,6 +1,6 @@
   {
     "repo" : {
-      "repositories": ["gradle-dev-local","jcenter","docker-dev-local","docker-remote"],
+      "repositories": ["gradle-dev-local","jcenter","docker-dev-local","docker-remote","helm-local","helm-remote"],
       "actions": {
           "groups" : {
             "dev-team" : ["write","annotate", "read"],
@@ -9,7 +9,7 @@
       }
     },
     "build" : {
-      "include-patterns" : ["gradle/**","docker-framework/**","docker-app//**"],
+      "include-patterns" : ["gradle/**","docker-framework/**","docker-app/**","helm-build/**"],
       "repositories": ["artifactory-build-info"],
       "actions": {
         "groups" : {

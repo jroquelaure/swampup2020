@@ -12,7 +12,8 @@
         "delivery-team": [
           "read",
           "write",
-          "distribute"
+          "distribute",
+          "annotate"
         ]
       }
     }
