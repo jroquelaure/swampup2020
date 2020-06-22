@@ -231,20 +231,6 @@ jfrog rt use orbiter-delivery
 
 jfrog rt dpl $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1 docker-virtual
 
-#maintenance
-
-# Find the latest released artifacts from specific build
-curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module5/largestFile.aql
-
-#AQl to find all archive with specific jar in it
- curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module5/junitfilter.aql
-
-#AQL for cleanup
-curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module2/cleanup.aql
-
-curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module5/largestFile.aql
-#or
-jfrog rt s --spec $SCRIPT_DIR/module5/cleanup.spec
 
 # distribution 
 
@@ -258,3 +244,19 @@ export EDGE_URL=34.71.197.235:8082
 curl -uadmin:$ADMIN_PASSWORD -X PATCH  http://$EDGE_URL/artifactory/api/system/configuration -T $SCRIPT_DIR/module1/repo.yaml
 
 jfrog rt rbd myApp 1.0.$BUILD_NUMBER --dist-rules=$SCRIPT_DIR/module5/dist-rules.json
+
+
+#maintenance
+
+# Find the latest released artifacts from specific build
+curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module6/largestFile.aql
+
+#AQl to find all archive with specific jar in it
+ curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module6/junitfilter.aql
+
+#AQL for cleanup
+curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module6/stats.aql
+
+curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module6/largestFile.aql
+#or
+jfrog rt s --spec $SCRIPT_DIR/module5/cleanup.spec

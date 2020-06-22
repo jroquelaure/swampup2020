@@ -4,9 +4,9 @@
           "aql": {
             "items.find": {
                 "type":"file",
-                "stat.downloads":{"$lte":"1"},
+                "stat.downloads":{"$lte":"10"},
                 "stat.downloaded":{"$before":"1d"},
-                "repo":{"$nmatch":"*prod*"}
+                "repo":{"$nmatch":"*dev*"}
             }
           }
         }
