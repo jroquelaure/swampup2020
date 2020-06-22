@@ -77,14 +77,12 @@ export API_KEY=<apiKey>
 jfrog rt c orbitera
 
 #Upload generic libs to Artifactory with props
-
-jfrog rt u ....
-# jfrog rt u /Users/jon/workspace/kubernetes_example/docker-framework/tomcat/apache-tomcat-8.tar.gz tomcat-local/
-
 #profile for release with write permission on tomcat-local
 jfrog rt c orbitera-release
 jfrog rt use orbitera-release
 
+jfrog rt u ....
+# jfrog rt u /Users/jon/workspace/kubernetes_example/docker-framework/tomcat/apache-tomcat-8.tar.gz tomcat-local/
 
 # Find largest and not in use
 curl -uadmin:$ADMIN_PASSWORD -X POST http://$ARTIFACTORY_URL/artifactory/api/search/aql -T $SCRIPT_DIR/module2/largestFile.aql
@@ -176,6 +174,8 @@ jfrog rt bp docker-framework $BUILD_NUMBER
 
 
 #scan
+jfrog rt use orbitera-release
+
 jfrog rt bs docker-framework $BUILD_NUMBER
 
 #promote
@@ -189,6 +189,8 @@ jfrog rt bpr docker-framework $BUILD_NUMBER docker-prod-local --status=released 
 jfrog rt dl --spec appmodules-download.json --build-name=docker-app --build-number=$BUILD_NUMBER --module=app
 
 #build
+jfrog rt use orbitera
+
 docker build . -t $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:$IMAGE_TAG  -f Dockerfile --build-arg REGISTRY=$ARTIFACTORY_URL/docker-virtual --build-arg BASE_TAG=$IMAGE_TAG
 
 jfrog rt dp $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:$IMAGE_TAG docker-virtual --build-name=docker-app --build-number=$BUILD_NUMBER --module=app
@@ -227,7 +229,7 @@ curl -uadmin:$ADMIN_PASSWORD -X POST -H "content-type: application/json"  http:/
 
 # redo the whole thing or show it in pipelines and trigger a build on docker framework
 #or just use delivery to pull
-jfrog rt use orbiter-delivery
+jfrog rt use orbitera-delivery
 
 jfrog rt dpl $ARTIFACTORY_URL/docker-virtual/jfrog-docker-app:1 docker-virtual
 
@@ -239,9 +241,11 @@ curl -uadmin:$ADMIN_PASSWORD -X PUT http://$ARTIFACTORY_URL/artifactory/api/v2/s
 jfrog rt rbc myApp 1.0.$BUILD_NUMBER --sign=true --spec=$SCRIPT_DIR/module5/rb-spec.json --spec-vars BUILD_NUMBER=$BUILD_NUMBER
 
 #need to create target repositories for distribution on edge
-export EDGE_URL=34.71.197.235:8082
+export EDGE_URL=35.202.21.252:8082
 
 curl -uadmin:$ADMIN_PASSWORD -X PATCH  http://$EDGE_URL/artifactory/api/system/configuration -T $SCRIPT_DIR/module1/repo.yaml
+
+curl -uadmin:$ADMIN_PASSWORD -H "content-type: application/json"  -X PUT http://$ARTIFACTORY_URL/distribution/api/v1/security/permissions/perm-delivery -T $SCRIPT_DIR/module5/permission-destination.json 
 
 jfrog rt rbd myApp 1.0.$BUILD_NUMBER --dist-rules=$SCRIPT_DIR/module5/dist-rules.json
 
